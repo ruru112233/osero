@@ -53,6 +53,7 @@ public class BoardManager : MonoBehaviour
                 if (board)
                 {
                     SetStorn(board);
+
                 }
             }
             // 石の数をカウント
@@ -61,7 +62,7 @@ public class BoardManager : MonoBehaviour
 
             bool endFlag = GameEndCheck();
 
-            Debug.Log(endFlag);
+            //Debug.Log(endFlag);
         }
     }
 
@@ -217,6 +218,12 @@ public class BoardManager : MonoBehaviour
                             currentBoardState[i, j] = boardState[i, j];
                         }
                     }
+
+                    if (!HasValidMove(newStoneState))
+                    {
+                        Debug.Log("パス");
+                    }
+
                 }
             }
         }
@@ -261,8 +268,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     for (int flipY = y + 1; flipY < currentY; flipY++)
                     {
                         flippableStones.Add(new Vector2Int(x, flipY));
@@ -301,8 +306,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     for (int flipY = y - 1; flipY > currentY; flipY--)
                     {
                         flippableStones.Add(new Vector2Int(x, flipY));
@@ -327,7 +330,6 @@ public class BoardManager : MonoBehaviour
     private List<Vector2Int> RightStornCheck(int x, int y)
     {
         List<Vector2Int> flippableStones = new List<Vector2Int>();
-        
         if (x == BOARD_MAXCOUNT_X - 1) return flippableStones; // 最右行であったら何もしない
         
         int currentX = x + 1;
@@ -343,8 +345,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     for (int flipX = x + 1; flipX < currentX; flipX++)
                     {
                         flippableStones.Add(new Vector2Int(flipX, y));
@@ -375,15 +375,13 @@ public class BoardManager : MonoBehaviour
         bool canFlip = false; // ひっくり返せるかどうか
 
         // 相手の石を見つけるまで左に進む
-        while (currentX > 0 && boardState[currentX, y] != eStoneState.EMPTY)
+        while (currentX >= 0 && boardState[currentX, y] != eStoneState.EMPTY)
         {
             eStoneState opponentStone = blackTurn ? eStoneState.WHITE : eStoneState.BLACK;
             eStoneState myStone = blackTurn ? eStoneState.BLACK : eStoneState.WHITE;
 
             if (boardState[currentX, y] == myStone)
             {
-                Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
                     for (int flipX = x - 1; flipX > currentX; flipX--)
@@ -416,7 +414,6 @@ public class BoardManager : MonoBehaviour
         int currentX = x + 1;
         int currentY = y + 1;
         bool canFlip = false; // ひっくり返せるかどうか
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " currentX : " + currentX + "   currentY :" + currentY);
 
         // 相手の石を見つけるまで右上に進む
         while (currentX < BOARD_MAXCOUNT_X && currentY < BOARD_MAXCOUNT_Z && boardState[currentX, currentY] != eStoneState.EMPTY)
@@ -428,8 +425,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     int flipX = x + 1;
                     int flipY = y + 1;
                     while (flipX < currentX && flipY < currentY)
@@ -465,12 +460,9 @@ public class BoardManager : MonoBehaviour
         int currentX = x + 1;
         int currentY = y - 1;
         bool canFlip = false; // ひっくり返せるかどうか
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " currentX : " + currentX + "   currentY :" + currentY);
 
         while (currentX < BOARD_MAXCOUNT_X && currentY >= 0 && boardState[currentX, currentY] != eStoneState.EMPTY)
         {
-            Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " currentX : " + currentX + "   currentY :" + currentY);
-
             eStoneState opponentStone = blackTurn ? eStoneState.WHITE : eStoneState.BLACK;
             eStoneState myStone = blackTurn ? eStoneState.BLACK : eStoneState.WHITE;
 
@@ -478,8 +470,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     int flipX = x + 1;
                     int flipY = y - 1;
                     while (flipX < currentX && flipY > currentY)
@@ -571,8 +561,6 @@ public class BoardManager : MonoBehaviour
             {
                 if (canFlip) // 自分の石に到達し、その間に相手の石があった場合
                 {
-                    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name + " 手数：  " + counter);
-
                     int flipX = x - 1;
                     int flipY = y - 1;
                     while (flipX > currentX && flipY > currentY)
@@ -656,6 +644,71 @@ public class BoardManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private bool CanPlaceStone(int x, int z, eStoneState player)
+    {
+        if (currentBoardState[x, z] != eStoneState.EMPTY)
+        {
+            return false;
+        }
+
+        // 8方向をチェック
+        // 左上、上、右上、左、右、左下、下、右下
+        int[] dx = { -1, 0, 1, -1, 1, -1,  0,  1};
+        int[] dz = {  1, 1, 1,  0, 0, -1, -1, -1};
+        for (int i = 0; i < 8; i++)
+        {
+            int nx = x + dx[i];
+            int nz = z + dz[i];
+            bool foundOpponent = false;
+
+            while (nx >= 0 && nx < BOARD_MAXCOUNT_X && nz >= 0 && nz < BOARD_MAXCOUNT_Z)
+            {
+                if (currentBoardState[nx, nz] == eStoneState.EMPTY)
+                {
+                    break;
+                }
+
+                if (currentBoardState[nx, nz] == (player == eStoneState.BLACK ? eStoneState.WHITE : eStoneState.BLACK))
+                {
+                    foundOpponent = true;
+                }
+                else if(currentBoardState[nx, nz] == player)
+                {
+                    if (foundOpponent)
+                    {
+                        return true;
+                    }
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+
+                nx += dx[i];
+                nz += dz[i];
+            }
+        }
+
+        return false;
+    }
+
+    // 全ての位置をチェックする関数
+    private bool HasValidMove(eStoneState player)
+    {
+        for (int x = 0; x < BOARD_MAXCOUNT_X; x++)
+        {
+            for(int z = 0; z < BOARD_MAXCOUNT_Z; z++)
+            {
+                if (CanPlaceStone(x, z, player))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
