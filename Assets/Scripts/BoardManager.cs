@@ -19,6 +19,8 @@ public class BoardManager : MonoBehaviour
         private set { blackTurn = value; }
     }
 
+    private bool startTurnFlag = false;
+
     private eStoneState[,] boardState = new eStoneState[BOARD_MAXCOUNT_X, BOARD_MAXCOUNT_Z];
     private eStoneState[,] currentBoardState = new eStoneState[BOARD_MAXCOUNT_X, BOARD_MAXCOUNT_Z];
     GameObject clickedGameObject;
@@ -34,6 +36,7 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
+        startTurnFlag = true;
         // 8x8のボードを生成する
         CreateBoad();
 
@@ -42,6 +45,16 @@ public class BoardManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (startTurnFlag)
+        {
+            eStoneState stoneState = blackTurn ? eStoneState.BLACK : eStoneState.WHITE;
+            
+            if (!HasValidMove(stoneState))
+            {
+                Debug.Log("パス");
+            }
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -219,11 +232,8 @@ public class BoardManager : MonoBehaviour
                         }
                     }
 
-                    if (!HasValidMove(newStoneState))
-                    {
-                        Debug.Log("パス");
-                    }
-
+                    // startTurnFlagを有効にする
+                    startTurnFlag = true;
                 }
             }
         }
@@ -659,12 +669,13 @@ public class BoardManager : MonoBehaviour
         int[] dz = {  1, 1, 1,  0, 0, -1, -1, -1};
         for (int i = 0; i < 8; i++)
         {
-            int nx = x + dx[i];
-            int nz = z + dz[i];
+            int nx = x + dx[i]; // 0 1 = 1
+            int nz = z + dz[i]; // 0 1 = 1
             bool foundOpponent = false;
 
             while (nx >= 0 && nx < BOARD_MAXCOUNT_X && nz >= 0 && nz < BOARD_MAXCOUNT_Z)
             {
+                
                 if (currentBoardState[nx, nz] == eStoneState.EMPTY)
                 {
                     break;
