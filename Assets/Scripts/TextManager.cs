@@ -9,6 +9,8 @@ public class TextManager : MonoBehaviour
     public Text whiteStoneCounterText;
     public Text blackStoneCounterText;
 
+    [SerializeField] private GameObject pathText;
+
     private int blackStoneCounter = 0;
     private int whiteStoneCounter = 0;
     public int BlackStoneCounter { 
@@ -29,11 +31,10 @@ public class TextManager : MonoBehaviour
     {
         turnText.text = "éËî‘ÅFÅ@" + BLACK_STR;
 
-        //BlackStoneCounter = 0;
-        //WhiteStoneCounter = 0;
-
         blackStoneCounterText.text = BLACK_STR + ":" + BlackStoneCounter;
         whiteStoneCounterText.text = WHITE_STR + ":" + WhiteStoneCounter;
+
+        pathText.SetActive(false);
     }
 
     // Update is called once per frame
@@ -50,5 +51,15 @@ public class TextManager : MonoBehaviour
 
         blackStoneCounterText.text = BLACK_STR + ":" + BlackStoneCounter;
         whiteStoneCounterText.text = WHITE_STR + ":" + WhiteStoneCounter;
+    }
+
+    public void ValidPathText()
+    {
+        pathText.SetActive(true);
+    }
+
+    public void InvalidPathText()
+    {
+        pathText.SetActive(false);
     }
 }
