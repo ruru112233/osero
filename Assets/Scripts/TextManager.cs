@@ -11,6 +11,9 @@ public class TextManager : MonoBehaviour
 
     [SerializeField] private GameObject pathText;
 
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private Text resultWhiteCountText, resultBlackCountText, resultText;
+
     private int blackStoneCounter = 0;
     private int whiteStoneCounter = 0;
     public int BlackStoneCounter { 
@@ -35,6 +38,7 @@ public class TextManager : MonoBehaviour
         whiteStoneCounterText.text = WHITE_STR + ":" + WhiteStoneCounter;
 
         pathText.SetActive(false);
+        resultPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -61,5 +65,30 @@ public class TextManager : MonoBehaviour
     public void InvalidPathText()
     {
         pathText.SetActive(false);
+    }
+
+    public void VeiwResult()
+    {
+        resultPanel.SetActive(true);
+        resultBlackCountText.text = "•F" + BlackStoneCounter;
+        resultWhiteCountText.text = "”’F" + WhiteStoneCounter;
+
+        int result = BlackStoneCounter - WhiteStoneCounter;
+
+        string str = "";
+        if (0 < result)
+        {
+            str = "•‚ÌŸ‚¿";
+        }
+        else if(0 > result)
+        {
+            str = "”’‚ÌŸ‚¿";
+        }
+        else
+        {
+            str = "ˆø‚«•ª‚¯";
+        }
+
+        resultText.text = str;
     }
 }
