@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,7 +52,7 @@ public class BoardManager : MonoBehaviour
             
             if (!HasValidMove(stoneState))
             {
-                Debug.Log("ƒpƒX");
+                StartCoroutine(VeiwPathText());
             }
         }
 
@@ -77,6 +78,15 @@ public class BoardManager : MonoBehaviour
 
             //Debug.Log(endFlag);
         }
+    }
+
+    IEnumerator VeiwPathText()
+    {
+        GameManager.instance.textManager.ValidPathText();
+
+        yield return new WaitForSeconds(1.0f);
+
+        GameManager.instance.textManager.InvalidPathText();
     }
 
     public void CreateBoad()
