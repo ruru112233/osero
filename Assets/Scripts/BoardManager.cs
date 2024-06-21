@@ -48,12 +48,21 @@ public class BoardManager : MonoBehaviour
     {
         if (startTurnFlag)
         {
-            eStoneState stoneState = blackTurn ? eStoneState.BLACK : eStoneState.WHITE;
-            
-            if (!HasValidMove(stoneState))
+            if (GameEndCheck())
             {
-                StartCoroutine(VeiwPathText());
+                GameManager.instance.textManager.VeiwResult();
             }
+            else
+            {
+                eStoneState stoneState = blackTurn ? eStoneState.BLACK : eStoneState.WHITE;
+
+                if (!HasValidMove(stoneState))
+                {
+                    StartCoroutine(VeiwPathText());
+                }
+            }
+
+            startTurnFlag = false;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -74,9 +83,6 @@ public class BoardManager : MonoBehaviour
             GameManager.instance.textManager.BlackStoneCounter = BlackStoneCount();
             GameManager.instance.textManager.WhiteStoneCounter = WhiteStoneCount();
 
-            bool endFlag = GameEndCheck();
-
-            //Debug.Log(endFlag);
         }
     }
 
@@ -87,6 +93,8 @@ public class BoardManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
 
         GameManager.instance.textManager.InvalidPathText();
+
+        blackTurn = !blackTurn;
     }
 
     public void CreateBoad()
@@ -646,11 +654,9 @@ public class BoardManager : MonoBehaviour
     private bool GameEndCheck()
     {
         // 黒の石が0個かチェック
-        if (0 != BlackStoneCount()) return false;
-
+        if (0 == BlackStoneCount()) return true;
         // 白の石が0個かチェック
-        if (0 != WhiteStoneCount()) return false;
-
+        if (0 == WhiteStoneCount()) return true;
         // 空のマスが存在するかチェック
         for (int i = 0; i < currentBoardState.GetLength(0); i++)
         {
@@ -662,7 +668,6 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
-
         return true;
     }
 
